@@ -85,8 +85,8 @@ void iniciarMina(vector<vector<char>>& mina, vector<vector<int>>& diamantes){
 void armadilhasPistas(vector<vector<char>>& mina){
     // adiciona armadilhas e pistas aleatoriamente
     int totalQuadros = LINHAS * COLUNAS;
-    int numPistas = totalQuadros * 5 / 100;
-    int numArmadilhas = totalQuadros * 10 / 100;
+    int numPistas = totalQuadros * 10 / 100;
+    int numArmadilhas = totalQuadros * 15 / 100;
 
     while (numPistas > 0){
         int r = rand() % LINHAS;
@@ -106,8 +106,8 @@ void armadilhasPistas(vector<vector<char>>& mina){
         }
     }
 
-    int numTeleportes = totalQuadros * 3 / 100;
-    int numExplosoes = totalQuadros * 2 / 100;
+    int numTeleportes = totalQuadros * 2 / 100;
+    int numExplosoes = totalQuadros * 3 / 100;
 
     while (numTeleportes > 0){
         int r = rand() % LINHAS;
@@ -213,7 +213,11 @@ void jogar(vector<vector<char>>& mina, vector<vector<int>>& diamantes, vector<Jo
             else if (direcao == 'd' && movimentoValido(novaLinha, novaColuna + 1)) novaColuna++;
 
             char conteudoNovaPosicao = mina[novaLinha][novaColuna];
-            mina[jogadores[i].linha][jogadores[i].coluna] = '0' + i; // deixa um rastro do jogador na posição anterior
+            
+            // define um rastro na posição anterior do jogador
+            mina[jogadores[i].linha][jogadores[i].coluna] = '0' + i;
+            
+            // atualiza a nova posição do jogador
             jogadores[i].linha = novaLinha;
             jogadores[i].coluna = novaColuna;
 
@@ -232,20 +236,29 @@ void jogar(vector<vector<char>>& mina, vector<vector<int>>& diamantes, vector<Jo
             } else if (conteudoNovaPosicao == TELEPORTE){
                 jogadores[i].pontuacao += 5;
 
+                // teleporta o jogador para uma nova posição aleatória
+                int teleporteLinha, teleporteColuna;
                 do {
-                    jogadores[i].linha = rand() % LINHAS;
-                    jogadores[i].coluna = rand() % COLUNAS;
+                    teleporteLinha = rand() % LINHAS;
+                    teleporteColuna = rand() % COLUNAS;
                 } 
-                while (mina[jogadores[i].linha][jogadores[i].coluna] != VAZIO);
+                while (mina[teleporteLinha][teleporteColuna] != VAZIO);
+
+                // define o rastro na posição original
                 mina[jogadores[i].linha][jogadores[i].coluna] = '0' + i;
+                
+                // atualiza a nova posição do jogador na mina
+                jogadores[i].linha = teleporteLinha;
+                jogadores[i].coluna = teleporteColuna;
+                
+                // coloca o jogador na nova posição após o teleporte
+                mina[teleporteLinha][teleporteColuna] = '0' + i;
             } else if (conteudoNovaPosicao == EXPLOSAO){
                 jogadores[i].pontuacao -= 15;
                 jogadores[i].pularRodada = true;
                 mina[novaLinha][novaColuna] = '!';
             }
             
-            jogadores[i].linha = novaLinha;
-            jogadores[i].coluna = novaColuna;
             totalJogadas++;
         }
     }
